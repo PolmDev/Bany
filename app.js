@@ -4,6 +4,7 @@ import { createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceCh
 // import ytdl from "discord-ytdl-core";
 import yts from "yt-search";
 import youtubedl from "youtube-dl-exec";
+import { search_youtube } from "./commands/play.js";
 
 const bany = new Client({
   intents: [
@@ -20,11 +21,6 @@ bany.on("ready", async () => {
 
 bany.on("messageCreate", async (msg) => {
   console.log(msg.content);
-
-  // Search for videos on YouTube
-  // const r = await yts(msg.content);
-  // const videos = r.videos.slice(0, 3);
-  // console.log(videos);
 
   if (msg.content === "join") {
     const channel = msg.member?.voice.channel;
@@ -87,6 +83,10 @@ bany.on("messageCreate", async (msg) => {
   }
 });
 
-bany.on("interactionCreate", async (interaction) => {});
+bany.on("interactionCreate", async (interaction) => {
+  console.log(interaction);
+
+  search_youtube("아이유");
+});
 
 bany.login(process.env.TOKEN);
