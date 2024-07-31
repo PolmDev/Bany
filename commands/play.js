@@ -12,22 +12,23 @@ const music_queue = {};
 
 let isPlaying = false;
 
-const search_youtube = async (quary) => {
-  const music_list = await yts(quary);
-  return music_list.videos[0].url;
+const search_youtube = async (query) => {
+  const options = {
+    query: query,
+    category: "music",
+  };
+  const music_list = await yts(options);
+
+  return music_list.videos[0];
 };
 
 const play_next = async (connection, player, guildId) => {
-  console.log(music_queue);
-  console.log(guildId);
   if (music_queue[guildId].length == 0) {
     isPlaying = false;
     return;
   }
 
-  console.log(1);
-
-  const music = music_queue[guildId][0];
+  const music = music_queue[guildId][0].url;
   music_queue[guildId].shift();
 
   const output = await youtubedl(music, {
@@ -42,6 +43,7 @@ const play_next = async (connection, player, guildId) => {
   });
 
   const resource_url = output.formats.find((format) => format.format_id === "251").url;
+  //console.log(output.formats);
 
   let resource = createAudioResource(resource_url);
 
@@ -52,15 +54,15 @@ const play_next = async (connection, player, guildId) => {
 export const play = async (interaction) => {
   const voiceChannel = interaction.member?.voice.channel;
   if (voiceChannel) {
-    const quary = interaction.options.getString("title");
+    const query = interaction.options.getString("title");
 
-    const url = await search_youtube(quary);
+    const youtube = await search_youtube(query);
 
     if (!(interaction.guildId in music_queue)) {
       music_queue[interaction.guildId] = [];
     }
 
-    music_queue[interaction.guildId].push(url);
+    music_queue[interaction.guildId].push(youtube);
 
     const connection = joinVoiceChannel({
       channelId: voiceChannel.id,
@@ -72,14 +74,13 @@ export const play = async (interaction) => {
 
     player.on(AudioPlayerStatus.Idle, () => {
       play_next(connection, player, interaction.guildId);
+      console.log("hello");
     });
 
     if (!isPlaying) {
       isPlaying = true;
       play_next(connection, player, interaction.guildId);
     }
-
-    console.log(music_queue);
   } else {
     //voice channel none
   }
