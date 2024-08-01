@@ -36,13 +36,16 @@ const play_next = async (connection, player, guildId) => {
     noWarnings: true,
     extractAudio: true,
     audioFormat: "mp3",
+
     noCheckCertificate: true,
     preferFreeFormats: true,
     youtubeSkipDashManifest: true,
     referer: "https://google.com",
   });
 
-  const resource_url = output.formats.find((format) => format.format_id === "251").url;
+  console.log(output);
+
+  const resource_url = output.formats.find((format) => format.format_note === "medium").url;
   //console.log(output.formats);
 
   let resource = createAudioResource(resource_url);
